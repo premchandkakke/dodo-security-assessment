@@ -129,7 +129,7 @@ jobs:
           sh -s -- -b /usr/local/bin
 
       - name: Generate CycloneDX SBOM
-         run: |
+        run: |
           syft ghcr.io/premchandkakke/ledger-api:v1 \
             -o cyclonedx-json=sbom-cyclonedx.json
 
