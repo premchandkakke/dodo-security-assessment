@@ -26,55 +26,57 @@ spec:
         runAsNonRoot: true
         runAsUser: 10001
         fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
 
       containers:
-      - name: ledger-api
+        - name: ledger-api
 
-        image: ghcr.io/premchandkakke/ledger-api:d1198db489751d3cd0a892808bdaf0dbd11e3de7
+          image: ghcr.io/premchandkakke/ledger-api:d1198db489751d3cd0a892808bdaf0dbd11e3de7
 
-        imagePullPolicy: Always
+          imagePullPolicy: Always
 
-        ports:
-        - containerPort: 8080
+          ports:
+            - containerPort: 8080
 
-        env:
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: ledger-api-secret
-              key: DB_PASSWORD
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ledger-api-secret
+                  key: DB_PASSWORD
 
-        - name: STRIPE_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: ledger-api-secret
-              key: STRIPE_API_KEY
+            - name: STRIPE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ledger-api-secret
+                  key: STRIPE_API_KEY
 
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          readOnlyRootFilesystem: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
 
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
 
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
