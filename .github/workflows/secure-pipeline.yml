@@ -122,13 +122,14 @@ jobs:
       - name: Push Docker Image to GHCR
         run: |
           docker push ghcr.io/premchandkakke/ledger-api:v1
-            - name: Install Syft
+
+      - name: Install Syft
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
           sh -s -- -b /usr/local/bin
 
       - name: Generate CycloneDX SBOM
-        run: |
+         run: |
           syft ghcr.io/premchandkakke/ledger-api:v1 \
             -o cyclonedx-json=sbom-cyclonedx.json
 
