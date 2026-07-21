@@ -43,8 +43,7 @@ jobs:
 
       - name: Install Gitleaks
         run: |
-          wget -qO- https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz \
-          | tar -xz
+          wget -qO- https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar -xz
           sudo mv gitleaks /usr/local/bin/
 
       - name: Run Gitleaks
@@ -56,6 +55,28 @@ jobs:
             --redact \
             --verbose
 
+  trivy-fs:
+    name: Trivy Filesystem Scan
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - semgrep
+      - gitleaks
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Filesystem Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: "0"
+
   build:
     name: Docker Build
 
@@ -64,6 +85,7 @@ jobs:
     needs:
       - semgrep
       - gitleaks
+      - trivy-fs
 
     steps:
       - name: Checkout Repository
