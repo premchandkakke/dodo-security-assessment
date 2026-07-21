@@ -107,13 +107,13 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            -t ghcr.io/premchandkakke/ledger-api:v1 \
+            -t ghcr.io/premchandkakke/ledger-api:${GITHUB_SHA} \
             ./task2-secure-cicd/app
 
       - name: Run Trivy Image Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/premchandkakke/ledger-api:v1
+          image-ref: ghcr.io/premchandkakke/ledger-api:${GITHUB_SHA}
           format: table
           severity: HIGH,CRITICAL
           exit-code: "0"
@@ -121,7 +121,24 @@ jobs:
 
       - name: Push Docker Image to GHCR
         run: |
-          docker push ghcr.io/premchandkakke/ledger-api:v1
+          docker push ghcr.io/premchandkakke/ledger-api:${GITHUB_SHA}
+
+      - name: Update GitOps Manifest
+        run: |
+          sed -i "s|image: ghcr.io/premchandkakke/ledger-api:.*|image: ghcr.io/premchandkakke/ledger-api:${GITHUB_SHA}|" task2-secure-cicd/argocd/deployment.yaml
+
+      - name: Commit Updated Manifest
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git add task2-secure-cicd/argocd/deployment.yaml
+
+          git commit -m "Update image tag to ${GITHUB_SHA}" || echo "No changes"
+
+          git pull --rebase origin main
+
+          git push origin HEAD:main
 
       - name: Install Syft
         run: |
@@ -130,7 +147,7 @@ jobs:
 
       - name: Generate CycloneDX SBOM
         run: |
-          syft ghcr.io/premchandkakke/ledger-api:v1 \
+          syft ghcr.io/premchandkakke/ledger-api:${GITHUB_SHA} \
             -o cyclonedx-json=sbom-cyclonedx.json
 
       - name: Upload CycloneDX SBOM
@@ -145,4 +162,4 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: "1"
         run: |
-          cosign sign --yes ghcr.io/premchandkakke/ledger-api:v1
+          cosign sign --yes ghcr.io/premchandkakke/ledger-api:${GITHUB_SHA}
