@@ -1,0 +1,9 @@
+title = "Dodo Security Assessment Gitleaks Config"
+
+[allowlist]
+description = "Ignore assessment artifacts"
+
+paths = [
+  '''task1-kubernetes-hardening/secrets/sealedsecret.yaml''',
+  '''README.md'''
+]
