@@ -52,4 +52,4 @@ jobs:
 
           docker build \
             -t ledger-api:latest \
-            ./app
+            ./task2-secure-cicd/app
