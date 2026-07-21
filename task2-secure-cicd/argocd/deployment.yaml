@@ -32,7 +32,7 @@ spec:
       containers:
         - name: ledger-api
 
-          image: ghcr.io/premchandkakke/ledger-api:d1198db489751d3cd0a892808bdaf0dbd11e3de7
+          image: ghcr.io/premchandkakke/ledger-api:527764b78df04d78a031c297526fa84993dd9497
 
           imagePullPolicy: Always
 
