@@ -6,6 +6,18 @@ Deploy the provided ledger-api application on Kubernetes and transform it into a
 
 ---
 
+## Environment
+
+| Component | Version |
+|------------|----------|
+| OS | Ubuntu 24.04 LTS |
+| Kubernetes | Kind |
+| kubectl | v1.36 |
+| Docker | Latest |
+| NGINX Ingress | Controller |
+| Kyverno | Latest |
+
+
 # Architecture
 
 The application consists of:
@@ -262,6 +274,33 @@ Compared to the original deployment:
 - Introduced NGINX Ingress
 
 ---
+
+# Bonus Features
+
+Implemented bonus requirements from the assessment:
+
+- Least Privilege RBAC
+- Pod Security Standards (Restricted)
+- Kyverno Admission Policy Enforcement
+- Demonstrated rejection of insecure workloads
+
+# Assignment Requirements Coverage
+
+| Requirement | Status |
+|------------|--------|
+| Deploy ledger-api | ✅ |
+| Deploy neighbour service | ✅ |
+| ConfigMap | ✅ |
+| Ingress | ✅ |
+| ServiceAccount | ✅ |
+| Least Privilege RBAC | ✅ |
+| Hardened securityContext | ✅ |
+| Resource Requests & Limits | ✅ |
+| Liveness & Readiness Probes | ✅ |
+| Sealed Secrets | ✅ |
+| Kyverno Admission Policies | ✅ |
+| Pod Security Standards (Restricted) | ✅ |
+
 
 # Result
 

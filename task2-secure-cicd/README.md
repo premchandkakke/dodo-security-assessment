@@ -6,6 +6,12 @@ This project implements a secure DevSecOps CI/CD pipeline using GitHub Actions. 
 
 ---
 
+## Objective
+
+The objective of this task was to implement a secure software delivery pipeline that enforces security throughout the software development lifecycle.
+
+The pipeline automatically builds, scans, signs, and deploys the application while preventing insecure artifacts from reaching the Kubernetes cluster.
+
 ## Architecture
 
 ```
@@ -174,6 +180,21 @@ Argo CD automatically detects the change and synchronizes the Kubernetes cluster
 
 ---
 
+# Security Gate Policy
+
+| Security Gate | Fail Policy |
+|--------------|-------------|
+| Semgrep | Fail on High severity findings |
+| Gitleaks | Fail if any secret is detected |
+| Trivy Filesystem Scan | Fail on Critical vulnerabilities |
+| Trivy Image Scan | Fail on Critical vulnerabilities |
+| Docker Build | Stop pipeline if build fails |
+| GHCR Push | Stop deployment if image push fails |
+| Cosign | Deployment proceeds only after successful image signing |
+| Argo CD | Deployment occurs only after all previous stages complete |
+
+For vulnerabilities without an available fix, the issue is documented, risk-assessed, and monitored until remediation becomes available.
+
 # Deployment
 
 Argo CD continuously monitors the Git repository.
@@ -186,6 +207,49 @@ Whenever a new image is published:
 4. Kubernetes deployment is synchronized automatically.
 
 ---
+
+# Drift Detection & Self-Healing
+
+Argo CD continuously compares the live Kubernetes cluster with the desired state stored in Git.
+
+Verification steps:
+
+1. Manually modify the Deployment using `kubectl edit`.
+2. Observe the application status change to **OutOfSync**.
+3. Argo CD automatically restores the desired configuration.
+4. The application returns to the **Synced** and **Healthy** state.
+
+# Verification
+
+GitHub Actions
+
+```bash
+GitHub → Actions
+```
+
+Container Images
+
+```bash
+ghcr.io/<github-username>/ledger-api
+```
+
+Argo CD
+
+```bash
+kubectl get applications -n argocd
+```
+
+Kubernetes
+
+```bash
+kubectl get pods -n payments
+```
+
+SBOM
+
+```bash
+ls reports/
+```
 
 # Evidence
 
@@ -210,10 +274,19 @@ The pipeline successfully implements a secure software supply chain with automat
 
 ---
 
-# Future Improvements
+# Assignment Coverage
 
-- SLSA Provenance Generation
-- Admission Controller Verification
-- Policy-as-Code using Kyverno
-- Automated Dependency Updates
-- Continuous Compliance Reporting
+| Requirement | Status |
+|-------------|--------|
+| GitHub Actions | ✅ |
+| Docker Build | ✅ |
+| Semgrep | ✅ |
+| Gitleaks | ✅ |
+| Trivy Filesystem Scan | ✅ |
+| Trivy Image Scan | ✅ |
+| GHCR Push | ✅ |
+| CycloneDX SBOM | ✅ |
+| Cosign Image Signing | ✅ |
+| Argo CD GitOps | ✅ |
+| Drift Detection | ✅ |
+| Self-Healing | ✅ |

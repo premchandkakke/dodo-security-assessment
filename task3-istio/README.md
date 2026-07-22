@@ -108,7 +108,15 @@ task3-istio/
 
 ## 1. Istio Installation
 
-Istio was installed using the **Demo Profile** with **Istio CNI** enabled to support Kubernetes Pod Security Restricted policies.
+Istio was installed using the Demo profile.
+
+Installed components:
+
+- Istiod
+- Istio Ingress Gateway
+- Istio Egress Gateway
+
+Automatic sidecar injection was enabled for the `payments` namespace.
 
 Features enabled:
 
@@ -242,7 +250,7 @@ kubectl describe pod <pod-name>
 
 Verified:
 
-- istio-validation
+- ledger-api
 - istio-proxy
 
 ---
@@ -321,6 +329,19 @@ kubectl get authorizationpolicy -n payments
 
 ---
 
+# Defense in Depth
+
+The deployment combines Kubernetes NetworkPolicies with Istio security policies.
+
+| Kubernetes NetworkPolicy | Istio Service Mesh |
+|--------------------------|--------------------|
+| Controls Pod-to-Pod network connectivity | Controls application-layer (L7) traffic |
+| Enforces network segmentation | Enforces workload identity |
+| Operates at Layer 3/4 | Operates at Layer 7 |
+| Blocks unauthorized network connections | Authorizes requests based on authenticated workload identity |
+
+Using both mechanisms provides layered security by protecting both the network and application layers.
+
 # Deployment Flow
 
 ```
@@ -398,6 +419,19 @@ screenshots/
 
 ---
 
+# Assignment Requirements Coverage
+
+| Requirement | Status |
+|-------------|--------|
+| Install Istio | ✅ |
+| Automatic Sidecar Injection | ✅ |
+| Gateway | ✅ |
+| VirtualService | ✅ |
+| DestinationRule | ✅ |
+| PeerAuthentication (STRICT mTLS) | ✅ |
+| AuthorizationPolicy | ✅ |
+| Kubernetes NetworkPolicy | ✅ |
+
 # Results
 
 Successfully implemented an Istio-based service mesh providing:
@@ -412,20 +446,15 @@ Successfully implemented an Istio-based service mesh providing:
 
 ---
 
-# Future Enhancements
 
-- Traffic Splitting (Canary Deployments)
-- Blue-Green Deployments
-- Circuit Breaking
-- Retry Policies
-- Rate Limiting
-- JWT Authentication
-- Request Authentication
-- Distributed Tracing (Jaeger)
-- Service Observability (Kiali)
-- Metrics Collection (Prometheus & Grafana)
 
----
+# Workload Identity
+
+Istio automatically issues X.509 certificates to workloads through `istiod`.
+
+Each workload receives a unique SPIFFE identity, which is used for mutual authentication within the service mesh.
+
+The trust root is managed by Istio's internal Certificate Authority (CA). Workload certificates are rotated automatically before expiration, ensuring secure and continuous identity management without manual intervention.
 
 # Conclusion
 
